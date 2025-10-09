@@ -1,8 +1,9 @@
 {
 "id": "{0C0B2E3A-9B8D-4B9A-8B94-5F4C8C9E3D11}",
 "name": "HYDROP Minimal",
-"author": "you",
+"author": "Kai",
 "url": "",
+"compatibility": { "version": "8.0" },
 "version": "1.0",
 "build": 1,
 "date": 20251009,
