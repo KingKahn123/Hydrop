@@ -1,7 +1,7 @@
 {
   "id": "{7F5C0F6B-7D16-46A2-A7B7-9E6B9F0A3C22}",
   "name": "HYDROP",
-  "type": 5,
+  "type": 3,
   "vendor": "hydrop",
   "aliases": ["Hydrop"],
   "parentRequirements": [],
