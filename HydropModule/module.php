@@ -9,7 +9,7 @@ class HYDROP extends IPSModule
         $this->RegisterPropertyString('AuthHeaderName', 'Authorization');
         $this->RegisterPropertyString('AuthHeaderPrefix', 'Bearer');
         $this->RegisterPropertyString('ApiKey', '');
-        $this->RegisterPropertyString('EndpointPath', '/api/v1/devices');
+        $this->RegisterPropertyString('EndpointPath', '/sensors/all/newest');
         $this->RegisterPropertyString('MeterId', '');
         $this->RegisterPropertyInteger('PollSeconds', 60);
 
