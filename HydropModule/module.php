@@ -118,36 +118,33 @@ class HYDROP extends IPSModule
         return $resp;
     }
 
-    private function parseKnown($data)
-    {
-        // Liste → nichts Spezielles, aber mappen
-        if (isset($data[0]) && is_array($data[0])) {
-            return; // Auto-Mapper übernimmt
-        }
-
-        // Einzelobjekt: versuche gängige Felder
-        $total = $this->findNumber($data, array('total', 'total_m3', 'consumptionTotal', 'volumeTotal'));
-        if ($total !== null && $this->GetIDForIdentSafe('Total')) {
-            SetValueFloat($this->GetIDForIdent('Total'), floatval($total));
-        }
-        $flow = $this->findNumber($data, array('flow', 'flow_lpm', 'flowRate', 'currentFlow'));
-        if ($flow !== null && $this->GetIDForIdentSafe('Flow')) {
-            SetValueFloat($this->GetIDForIdent('Flow'), floatval($flow));
-        }
-        $leak = $this->findBool($data, array('leak', 'leakDetected', 'leakage'));
-        if ($leak !== null && $this->GetIDForIdentSafe('Leak')) {
-            SetValueBoolean($this->GetIDForIdent('Leak'), (bool)$leak);
-        }
-        $ts = $this->findAny($data, array('timestamp', 'ts', 'time', 'updatedAt'));
-        if ($ts !== null && $this->GetIDForIdentSafe('LastTimestamp')) {
-            if (is_numeric($ts)) {
-                SetValueInteger($this->GetIDForIdent('LastTimestamp'), intval($ts));
-            } elseif (is_string($ts)) {
-                $unix = strtotime($ts);
-                SetValueInteger($this->GetIDForIdent('LastTimestamp'), $unix ? $unix : time());
-            }
-        }
+private function parseKnown($data)
+{
+    // Erwartetes Format: sensors -> records -> Werte
+    if (!isset($data['sensors'][0]['records'][0])) {
+        $this->SendDebug('HYDROP parseKnown', 'Unerwartetes JSON-Format', 0);
+        return;
     }
+
+    $record = $data['sensors'][0]['records'][0];
+
+    if (isset($record['meterValue'])) {
+        $this->MaintainVariable('Total', 'Gesamtverbrauch', VARIABLETYPE_FLOAT, '~Water', 0, true);
+        SetValueFloat($this->GetIDForIdent('Total'), (float)$record['meterValue']);
+    }
+
+    if (isset($record['timestamp'])) {
+        $this->MaintainVariable('LastTimestamp', 'Zeitstempel', VARIABLETYPE_INTEGER, '~UnixTimestamp', 0, true);
+        SetValueInteger($this->GetIDForIdent('LastTimestamp'), (int)$record['timestamp']);
+    }
+
+    if (isset($data['sensors'][0]['deviceID'])) {
+        $this->MaintainVariable('DeviceID', 'Gerät', VARIABLETYPE_STRING, '', 0, true);
+        SetValueString($this->GetIDForIdent('DeviceID'), (string)$data['sensors'][0]['deviceID']);
+    }
+
+    $this->SendDebug('HYDROP parseKnown', 'Werte aktualisiert', 0);
+}
 
     private function autoMapJson($data, $prefix = '')
     {
