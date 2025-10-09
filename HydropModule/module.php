@@ -1,5 +1,6 @@
 <?php
-declare(strict_types=1);
+// Hinweis: Maximale Kompatibilität – kein strict_types, keine Typehints, keine Returntypes
+
 class HYDROP extends IPSModule
 {
     public function Create()
@@ -19,10 +20,10 @@ class HYDROP extends IPSModule
         $this->RegisterTimer('PollTimer', 0, 'IPS_RequestAction($_IPS["TARGET"], "Poll", 0);');
 
         // Bekannte Variablen
-        $this->RegisterVariableFloat('Total', 'Total', '~Water');
-        $this->RegisterVariableFloat('Flow', 'Flow', '');
-        $this->RegisterVariableBoolean('Leak', 'Leak', '');
-        $this->RegisterVariableInteger('LastTimestamp', 'Last Timestamp', '~UnixTimestamp');
+        @$this->RegisterVariableFloat('Total', 'Total', '~Water');
+        @$this->RegisterVariableFloat('Flow', 'Flow', '');
+        @$this->RegisterVariableBoolean('Leak', 'Leak', '');
+        @$this->RegisterVariableInteger('LastTimestamp', 'Last Timestamp', '~UnixTimestamp');
 
         $this->SetStatus(201);
     }
@@ -31,7 +32,7 @@ class HYDROP extends IPSModule
     {
         parent::ApplyChanges();
         $ok = $this->isConfigComplete();
-        $this->SetTimerInterval('PollTimer', $ok ? $this->ReadPropertyInteger('PollSeconds') * 1000 : 0);
+        $this->SetTimerInterval('PollTimer', $ok ? ($this->ReadPropertyInteger('PollSeconds') * 1000) : 0);
         $this->SetStatus($ok ? 104 : 201);
     }
 
@@ -67,8 +68,8 @@ class HYDROP extends IPSModule
         try {
             $json = $this->apiGET($this->buildEndpoint());
             $this->SendDebug('Response', substr($json, 0, 4000), 0);
-            $data = json_decode($json, true);
-            if ($data === null) {
+            $data = @json_decode($json, true);
+            if (!is_array($data)) {
                 throw new Exception('Invalid JSON');
             }
 
@@ -77,42 +78,43 @@ class HYDROP extends IPSModule
                 $this->autoMapJson($data);
             }
             $this->SetStatus(104);
-        } catch (Throwable $e) {
+        } catch (Exception $e) {
             $this->SendDebug('Error', $e->getMessage(), 0);
             $this->SetStatus(202);
         }
     }
 
-    private function buildEndpoint(): string
+    private function buildEndpoint()
     {
         $base = rtrim($this->ReadPropertyString('BaseUrl'), '/');
         $path = '/' . ltrim($this->ReadPropertyString('EndpointPath'), '/');
         $meterId = trim($this->ReadPropertyString('MeterId'));
-        $path = str_replace(['{meterId}', '{meterID}', '{id}'], $meterId !== '' ? $meterId : '', $path);
+        $path = str_replace(array('{meterId}', '{meterID}', '{id}'), ($meterId !== '' ? $meterId : ''), $path);
         return $base . $path;
     }
 
-    private function apiGET(string $url): string
+    private function apiGET($url)
     {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_TIMEOUT, 20);
-        // SSL-Checks standardmäßig aktiv (Produktion)
 
-        $headers = ['Accept: application/json'];
+        $headers = array('Accept: application/json');
         $name = trim($this->ReadPropertyString('AuthHeaderName'));
         $prefix = trim($this->ReadPropertyString('AuthHeaderPrefix'));
         $key = trim($this->ReadPropertyString('ApiKey'));
         if ($name !== '' && $key !== '') {
-            $value = $prefix !== '' ? ($prefix . ' ' . $key) : $key;
+            $value = ($prefix !== '' ? ($prefix . ' ' . $key) : $key);
             $headers[] = $name . ': ' . $value;
         }
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
         $resp = curl_exec($ch);
         if ($resp === false) {
-            throw new Exception('cURL error: ' . curl_error($ch));
+            $err = curl_error($ch);
+            curl_close($ch);
+            throw new Exception('cURL error: ' . $err);
         }
         $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
@@ -122,7 +124,7 @@ class HYDROP extends IPSModule
         return $resp;
     }
 
-    private function parseKnown($data): bool
+    private function parseKnown($data)
     {
         // Liste → map
         if (isset($data[0]) && is_array($data[0])) {
@@ -131,24 +133,24 @@ class HYDROP extends IPSModule
         }
 
         if (is_array($data)) {
-            $total = $this->findNumber($data, ['total', 'total_m3', 'consumptionTotal', 'volumeTotal']);
+            $total = $this->findNumber($data, array('total', 'total_m3', 'consumptionTotal', 'volumeTotal'));
             if ($total !== null) {
-                $this->SetValue('Total', (float)$total);
+                SetValueFloat($this->GetIDForIdent('Total'), floatval($total));
             }
-            $flow = $this->findNumber($data, ['flow', 'flow_lpm', 'flowRate', 'currentFlow']);
+            $flow = $this->findNumber($data, array('flow', 'flow_lpm', 'flowRate', 'currentFlow'));
             if ($flow !== null) {
-                $this->SetValue('Flow', (float)$flow);
+                SetValueFloat($this->GetIDForIdent('Flow'), floatval($flow));
             }
-            $leak = $this->findBool($data, ['leak', 'leakDetected', 'leakage']);
+            $leak = $this->findBool($data, array('leak', 'leakDetected', 'leakage'));
             if ($leak !== null) {
-                $this->SetValue('Leak', (bool)$leak);
+                SetValueBoolean($this->GetIDForIdent('Leak'), (bool)$leak);
             }
-            $ts = $this->findNumber($data, ['timestamp', 'ts', 'time', 'updatedAt']);
+            $ts = $this->findNumber($data, array('timestamp', 'ts', 'time', 'updatedAt'));
             if ($ts !== null) {
                 if (is_numeric($ts)) {
-                    $this->SetValue('LastTimestamp', (int)$ts);
+                    SetValueInteger($this->GetIDForIdent('LastTimestamp'), intval($ts));
                 } elseif (is_string($ts)) {
-                    $this->SetValue('LastTimestamp', strtotime($ts) ?: time());
+                    SetValueInteger($this->GetIDForIdent('LastTimestamp'), strtotime($ts) ? strtotime($ts) : time());
                 }
             }
             $this->autoMapJson($data);
@@ -157,27 +159,27 @@ class HYDROP extends IPSModule
         return false;
     }
 
-    private function autoMapJson($data, string $prefix = ''): void
+    private function autoMapJson($data, $prefix = '')
     {
         if (is_array($data)) {
             foreach ($data as $k => $v) {
-                $name = $prefix . (is_string($k) ? $k : (string)$k);
+                $name = $prefix . (is_string($k) ? $k : strval($k));
                 if (is_array($v)) {
                     $this->autoMapJson($v, $name . '_');
                 } else {
                     if (is_numeric($v)) {
                         $ident = $this->sanitizeIdent($name);
                         $this->MaintainVariable($ident, $name, VARIABLETYPE_FLOAT, '', 0, true);
-                        $this->SetValue($ident, (float)$v);
+                        SetValueFloat($this->GetIDForIdent($ident), floatval($v));
                     } elseif (is_bool($v)) {
                         $ident = $this->sanitizeIdent($name);
                         $this->MaintainVariable($ident, $name, VARIABLETYPE_BOOLEAN, '', 0, true);
-                        $this->SetValue($ident, (bool)$v);
+                        SetValueBoolean($this->GetIDForIdent($ident), (bool)$v);
                     } elseif (is_string($v)) {
                         if (strlen($v) <= 120) {
                             $ident = $this->sanitizeIdent($name);
                             $this->MaintainVariable($ident, $name, VARIABLETYPE_STRING, '', 0, true);
-                            $this->SetValue($ident, $v);
+                            SetValueString($this->GetIDForIdent($ident), $v);
                         }
                     }
                 }
@@ -185,13 +187,16 @@ class HYDROP extends IPSModule
         }
     }
 
-    private function sanitizeIdent(string $name): string
+    private function sanitizeIdent($name)
     {
         $ident = preg_replace('/[^A-Za-z0-9_]/', '_', $name);
-        return substr($ident, 0, 30);
+        if (strlen($ident) > 30) {
+            $ident = substr($ident, 0, 30);
+        }
+        return $ident;
     }
 
-    private function findNumber(array $arr, array $keys)
+    private function findNumber($arr, $keys)
     {
         foreach ($keys as $k) {
             if (isset($arr[$k]) && is_numeric($arr[$k])) return $arr[$k];
@@ -199,7 +204,7 @@ class HYDROP extends IPSModule
         return null;
     }
 
-    private function findBool(array $arr, array $keys)
+    private function findBool($arr, $keys)
     {
         foreach ($keys as $k) {
             if (isset($arr[$k]) && is_bool($arr[$k])) return $arr[$k];
@@ -208,7 +213,7 @@ class HYDROP extends IPSModule
         return null;
     }
 
-    private function isConfigComplete(): bool
+    private function isConfigComplete()
     {
         if (trim($this->ReadPropertyString('BaseUrl')) === '') return false;
         if (trim($this->ReadPropertyString('ApiKey')) === '') return false;
