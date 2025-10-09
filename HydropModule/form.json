@@ -1,0 +1,22 @@
+{
+  "elements": [
+    {"type": "ValidationTextBox", "name": "BaseUrl", "caption": "Base URL", "value": "https://api.hydrop-systems.com"},
+    {"type": "RowLayout", "items": [
+      {"type": "ValidationTextBox", "name": "AuthHeaderName", "caption": "Auth Header Name", "value": "Authorization"},
+      {"type": "ValidationTextBox", "name": "AuthHeaderPrefix", "caption": "Auth Header Prefix", "value": "Bearer"}
+    ]},
+    {"type": "PasswordTextBox", "name": "ApiKey", "caption": "API Key", "value": ""},
+    {"type": "ValidationTextBox", "name": "MeterId", "caption": "Meter ID (optional)", "value": ""},
+    {"type": "ValidationTextBox", "name": "EndpointPath", "caption": "Endpoint Path", "value": "/api/v1/devices"},
+    {"type": "NumberSpinner", "name": "PollSeconds", "caption": "Poll-Intervall (Sekunden)", "minimum": 10, "maximum": 86400, "value": 300}
+  ],
+  "actions": [
+    {"type": "Button", "caption": "Testen (einmal abfragen)", "onClick": "HYDROP_TestOnce();"}
+  ],
+  "status": [
+    {"code": 102, "icon": "", "caption": "Wird erstellt"},
+    {"code": 104, "icon": "", "caption": "Aktiv"},
+    {"code": 201, "icon": "", "caption": "Konfiguration unvollständig"},
+    {"code": 202, "icon": "", "caption": "Fehler bei Abfrage"}
+  ]
+}
