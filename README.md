@@ -97,7 +97,7 @@ HydropModule/
 
 ## 🧑‍💻 Lizenz & Autor
 
-- **Autor:** Du 😉  
+- **Autor:** Kai Stockmann  
 - **Lizenz:** MIT  
 - **Version:** 1.0.0  
-- **Kompatibel mit:** IP-Symcon ≥ 6.0
+- **Kompatibel mit:** IP-Symcon ≥ 7.0
