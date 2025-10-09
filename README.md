@@ -1,32 +1,103 @@
-# HYDROP – IP‑Symcon Modul
+# HYDROP für IP-Symcon
 
-Dieses Modul ruft Daten der HYDROP REST API ab und legt/aktualisiert Variablen in IP‑Symcon. Es ist generisch konfigurierbar (Header, Prefix, Pfade) und enthält einen Auto‑Mapper für JSON.
+Ein IP-Symcon-Modul zur Integration von **HYDROP-Wasserzählern** über die offizielle REST-API (`https://api.hydrop-systems.com`).
 
-## Einrichtung
-1. Dateien in ein neues Modulverzeichnis unter `modules/Hydrop/` legen oder eigenes Git-Repo verwenden und in IP‑Symcon als Modul hinzufügen.
-2. Instanz erstellen und konfigurieren (Base URL, Header, Key, Endpoint, Intervall).
-3. Mit **Testen** überprüfen, welche Variablen angelegt werden; ggf. `MeterId` setzen und `EndpointPath` auf den Messwerte‑Endpoint anpassen.
+---
 
-## Authentifizierung
-- Trage den Header‑Namen (z. B. `Authorization` oder `x-api-key`) und ggf. ein Präfix (z. B. `Bearer`) in der Instanz ein. Der Request enthält dann `HeaderName: <Prefix> <ApiKey>`.
+## 🧩 Funktionen
 
-## Beispiel‑Endpoints (bitte API‑Doku prüfen)
-- Liste Geräte: `/api/v1/devices`
-- Letzte Messwerte: `/api/v1/devices/{meterId}/measurements?limit=1`
+- **Automatische Abfrage** der HYDROP-REST-API im festen Intervall  
+- **Messwerte**:
+  - Gesamtverbrauch *(m³)*
+  - Zeitstempel *(Unixzeit)*
+  - Gerät *(Name / ID)*
+  - Durchfluss *(Liter pro Minute, berechnet aus Delta zwischen zwei Messungen)*
+- **Optionale automatische Variable-Erstellung (Auto-Mapper)**  
+  → erzeugt alle numerischen/booleschen/String-Felder aus der JSON-Antwort
+- Konfigurierbarer API-Header, Endpunkt, Poll-Intervall
+- Unterstützt mehrere Zähler (jeweils eigene Instanz mit eigenem API-Key/Endpoint)
+- **Timersteuerung & manuelle Testabfrage** direkt in der Instanz
 
-## Variablen
-- **Total** – Gesamtverbrauch (m³)
-- **Flow** – Durchfluss (z. B. L/min)
-- **Leak** – Leckage erkannt (bool)
-- **Last Timestamp** – Zeitstempel der letzten Messung
-- Weitere Felder werden automatisch aus dem JSON gemappt.
+---
 
-## Fehleranalyse
-- Instanz‑Status **202**: HTTP/Parser‑Fehler → Debug‑Log prüfen.
-- **201**: Konfiguration unvollständig.
+## ⚙️ Installation
 
-## Anpassungen
-- In `parseKnown()` kannst du Keys auf die echten API‑Felder mappen.
-- In `autoMapJson()` werden alle numerischen/boolean Felder rekursiv als Variablen angelegt.
+1. Dieses Modul-Repository in IP-Symcon hinzufügen:
+   ```
+   https://<dein-github-repo>
+   ```
+2. Modul aktualisieren, falls es bereits eingebunden war.
+3. Neue Instanz anlegen:  
+   - Objekt hinzufügen → **Instanz** → **Hydrop**
 
-Lizenz: MIT
+---
+
+## 🔧 Konfiguration
+
+| Feld | Beschreibung |
+|------|---------------|
+| **Base URL** | Standard: `https://api.hydrop-systems.com` |
+| **Auth Header Name** | `apikey` *(laut HYDROP-API)* |
+| **Auth Header Prefix** | leer lassen |
+| **API Key** | Dein persönlicher API-Key |
+| **Endpoint Path** | z. B. `/sensors/all/newest` |
+| **Meter ID (optional)** | Wird automatisch ersetzt, falls im Pfad `{meterId}` vorkommt |
+| **Poll-Intervall (Sekunden)** | Zeit zwischen automatischen Abfragen (≥ 10 s) |
+| **Alle JSON-Felder automatisch anlegen** | (Checkbox) legt zusätzlich alle Felder der JSON-Antwort als Variablen an |
+
+---
+
+## ▶️ Bedienung
+
+**Buttons im Formular:**
+- **Testen (einmal abfragen)** → ruft den Endpoint sofort ab  
+- Der Poll-Timer startet nach „Übernehmen“ automatisch.
+
+---
+
+## 💧 Berechnete Werte
+
+| Variable | Einheit | Beschreibung |
+|-----------|----------|--------------|
+| `Gesamtverbrauch (m³)` | m³ | Aktueller Gesamtzählerstand |
+| `Zeitstempel` | Unix-Zeit | Zeitpunkt der Messung |
+| `Gerät` | – | ID/Name aus der API |
+| `Durchfluss (L/min)` | L/min | Berechnet aus ΔZählerstand / ΔZeit |
+
+Berechnungsformel:
+```
+Δm³ = aktueller_meterValue - letzter_meterValue
+Δt = aktueller_timestamp - letzter_timestamp
+Durchfluss [L/min] = (Δm³ * 1000) * (60 / Δt)
+```
+
+Der Durchflusswert erscheint **ab dem zweiten erfolgreichen Poll**.
+
+---
+
+## 🧠 Hinweise
+
+- HYDROP-API nutzt Header `apikey: <KEY>` (kein Bearer-Token).  
+- Wenn du andere Endpunkte abrufst (z. B. `/devices` oder `/measurements`), kannst du die JSON-Felder mit dem Auto-Mapper erkunden.  
+- Der Auto-Mapper kann im Formular deaktiviert werden, damit nur die Standard-Variablen angelegt bleiben.
+
+---
+
+## 📄 Modulstruktur
+
+```
+library.json             // Bibliothekseintrag
+HydropModule/
+├── module.json          // Instanzdefinition (type=3)
+├── module.php           // Logik & API-Aufrufe
+└── form.json            // Instanzformular
+```
+
+---
+
+## 🧑‍💻 Lizenz & Autor
+
+- **Autor:** Du 😉  
+- **Lizenz:** MIT  
+- **Version:** 1.0.0  
+- **Kompatibel mit:** IP-Symcon ≥ 6.0
