@@ -3,7 +3,7 @@
   "name": "HYDROP REST",
   "type": 5,
   "vendor": "hydrop",
-  "aliases": ["Hydrop", "Hydrop REST"],
+  "aliases": ["Hydrop"],
   "parentRequirements": [],
   "childRequirements": [],
   "implemented": [],
