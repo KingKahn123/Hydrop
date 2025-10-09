@@ -11,7 +11,7 @@
     {"type": "NumberSpinner", "name": "PollSeconds", "caption": "Poll-Intervall (Sekunden)", "minimum": 10, "maximum": 86400, "value": 300}
   ],
   "actions": [
-    {"type": "Button", "caption": "Testen (einmal abfragen)", "IPS_RequestAction($id, \"TestOnce\", 1);"}
+    {"type": "Button", "caption": "Testen (einmal abfragen)", "onClick": "IPS_RequestAction($id, \"TestOnce\", 1);"}
   ],
   "status": [
     {"code": 102, "caption": "Wird erstellt"},
