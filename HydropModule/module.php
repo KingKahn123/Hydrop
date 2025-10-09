@@ -12,7 +12,7 @@ class HYDROP extends IPSModule
         $this->RegisterPropertyString('EndpointPath', '/sensors/all/newest');
         $this->RegisterPropertyString('MeterId', '');
         $this->RegisterPropertyBoolean('EnableAutoMap', false);
-        $this->RegisterPropertyInteger('PollSeconds', 60);
+        $this->RegisterPropertyInteger('PollSeconds', 300);
 
         // Timer → ruft per RequestAction die Poll-Methode auf
         $this->RegisterTimer('PollTimer', 0, 'IPS_RequestAction($_IPS["TARGET"], "Poll", 0);');
