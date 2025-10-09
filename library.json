@@ -3,7 +3,6 @@
   "author": "DeinName",
   "name": "HYDROP (REST)",
   "url": "",
-  #"compatibility": { "version": "6.3" },
   "version": "1.0.0",
   "build": 1,
   "date": 20251009
