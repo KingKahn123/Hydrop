@@ -6,21 +6,22 @@ class HYDROP extends IPSModule
         parent::Create();
         // Konfigurations-Properties
         $this->RegisterPropertyString('BaseUrl', 'https://api.hydrop-systems.com');
-        $this->RegisterPropertyString('AuthHeaderName', 'Authorization');
-        $this->RegisterPropertyString('AuthHeaderPrefix', 'Bearer');
+        $this->RegisterPropertyString('AuthHeaderName', 'apikey');
+        $this->RegisterPropertyString('AuthHeaderPrefix', '');
         $this->RegisterPropertyString('ApiKey', '');
-        $this->RegisterPropertyString('EndpointPath', '/api/v1/devices');
+        $this->RegisterPropertyString('EndpointPath', '/sensors/all/newest');
         $this->RegisterPropertyString('MeterId', '');
+        $this->RegisterPropertyBoolean('EnableAutoMap', false);
         $this->RegisterPropertyInteger('PollSeconds', 60);
 
         // Timer → ruft per RequestAction die Poll-Methode auf
         $this->RegisterTimer('PollTimer', 0, 'IPS_RequestAction($_IPS["TARGET"], "Poll", 0);');
 
-        // Beispiel-Variablen (werden aktualisiert, wenn vorhanden)
-        @$this->RegisterVariableFloat('Total', 'Total', '~Water');
-        @$this->RegisterVariableFloat('Flow', 'Flow', '');
-        @$this->RegisterVariableBoolean('Leak', 'Leak', '');
-        @$this->RegisterVariableInteger('LastTimestamp', 'Last Timestamp', '~UnixTimestamp');
+        // Kern-Variablen
+        @$this->RegisterVariableFloat('Total', 'Gesamtverbrauch (m³)', '~Water');
+        @$this->RegisterVariableFloat('FlowLMin', 'Durchfluss (L/min)', '');
+        @$this->RegisterVariableInteger('LastTimestamp', 'Zeitstempel', '~UnixTimestamp');
+        @$this->RegisterVariableString('DeviceID', 'Gerät', '');
     }
 
     public function ApplyChanges()
@@ -63,15 +64,78 @@ class HYDROP extends IPSModule
                 throw new Exception('Invalid JSON');
             }
 
-            // Bekannte Felder versuchen
-            $this->parseKnown($data);
-            // Und alles weitere automatisch mappen
-            $this->autoMapJson($data);
+            // Bekannte Felder: sensors[0].records[0]
+            $record = $this->extractNewestRecord($data);
+            if ($record === null) {
+                $this->SendDebug('HYDROP', 'Kein Record gefunden', 0);
+                $this->SetStatus(104);
+                return;
+            }
+
+            $deviceId = isset($data['sensors'][0]['deviceID']) ? (string)$data['sensors'][0]['deviceID'] : '';
+            if ($deviceId !== '') {
+                $this->MaintainVariable('DeviceID', 'Gerät', VARIABLETYPE_STRING, '', 0, true);
+                SetValueString($this->GetIDForIdent('DeviceID'), $deviceId);
+            }
+
+            if (isset($record['meterValue'])) {
+                $this->MaintainVariable('Total', 'Gesamtverbrauch (m³)', VARIABLETYPE_FLOAT, '~Water', 0, true);
+                SetValueFloat($this->GetIDForIdent('Total'), floatval($record['meterValue']));
+            }
+            if (isset($record['timestamp'])) {
+                $this->MaintainVariable('LastTimestamp', 'Zeitstempel', VARIABLETYPE_INTEGER, '~UnixTimestamp', 0, true);
+                SetValueInteger($this->GetIDForIdent('LastTimestamp'), intval($record['timestamp']));
+            }
+
+            // Durchfluss aus Delta berechnen (L/min)
+            $this->updateFlowFromDelta($deviceId, $record);
+
+            // Optional: Auto-Mapper nur wenn explizit gewünscht
+            if ($this->ReadPropertyBoolean('EnableAutoMap')) {
+                $this->autoMapJson($data);
+            }
 
             $this->SetStatus(104);
         } catch (Exception $e) {
             $this->SendDebug('HYDROP Error', $e->getMessage(), 0);
             $this->SetStatus(202);
+        }
+    }
+
+    private function extractNewestRecord($data)
+    {
+        if (!isset($data['sensors'][0]['records'][0])) return null;
+        return $data['sensors'][0]['records'][0];
+    }
+
+    private function updateFlowFromDelta($deviceId, $record)
+    {
+        // Puffer pro Gerät speichern
+        $bufferRaw = $this->GetBuffer('last');
+        $buffer = $bufferRaw ? @json_decode($bufferRaw, true) : array();
+        if (!is_array($buffer)) $buffer = array();
+
+        $key = ($deviceId !== '') ? $deviceId : 'default';
+        $last = isset($buffer[$key]) ? $buffer[$key] : null;
+
+        if ($last && isset($record['meterValue']) && isset($record['timestamp'])) {
+            $dv = floatval($record['meterValue']) - floatval($last['meterValue']); // m³
+            $dt = intval($record['timestamp']) - intval($last['timestamp']);      // s
+            if ($dv >= 0 && $dt > 0) {
+                // m³ → Liter: *1000; pro Minute: *60/dt
+                $flowLMin = ($dv * 1000.0) * (60.0 / $dt);
+                $this->MaintainVariable('FlowLMin', 'Durchfluss (L/min)', VARIABLETYPE_FLOAT, '', 0, true);
+                SetValueFloat($this->GetIDForIdent('FlowLMin'), $flowLMin);
+            }
+        }
+
+        // Aktuelle Werte speichern
+        if (isset($record['meterValue']) && isset($record['timestamp'])) {
+            $buffer[$key] = array(
+                'meterValue' => floatval($record['meterValue']),
+                'timestamp'  => intval($record['timestamp'])
+            );
+            $this->SetBuffer('last', json_encode($buffer));
         }
     }
 
@@ -118,34 +182,7 @@ class HYDROP extends IPSModule
         return $resp;
     }
 
-private function parseKnown($data)
-{
-    // Erwartetes Format: sensors -> records -> Werte
-    if (!isset($data['sensors'][0]['records'][0])) {
-        $this->SendDebug('HYDROP parseKnown', 'Unerwartetes JSON-Format', 0);
-        return;
-    }
-
-    $record = $data['sensors'][0]['records'][0];
-
-    if (isset($record['meterValue'])) {
-        $this->MaintainVariable('Total', 'Gesamtverbrauch', VARIABLETYPE_FLOAT, '~Water', 0, true);
-        SetValueFloat($this->GetIDForIdent('Total'), (float)$record['meterValue']);
-    }
-
-    if (isset($record['timestamp'])) {
-        $this->MaintainVariable('LastTimestamp', 'Zeitstempel', VARIABLETYPE_INTEGER, '~UnixTimestamp', 0, true);
-        SetValueInteger($this->GetIDForIdent('LastTimestamp'), (int)$record['timestamp']);
-    }
-
-    if (isset($data['sensors'][0]['deviceID'])) {
-        $this->MaintainVariable('DeviceID', 'Gerät', VARIABLETYPE_STRING, '', 0, true);
-        SetValueString($this->GetIDForIdent('DeviceID'), (string)$data['sensors'][0]['deviceID']);
-    }
-
-    $this->SendDebug('HYDROP parseKnown', 'Werte aktualisiert', 0);
-}
-
+    // Optionaler Auto-Mapper (nur wenn EnableAutoMap=true)
     private function autoMapJson($data, $prefix = '')
     {
         if (!is_array($data)) return;
@@ -157,21 +194,15 @@ private function parseKnown($data)
                 if (is_numeric($v)) {
                     $ident = $this->sanitizeIdent($name);
                     $this->MaintainVariable($ident, $name, VARIABLETYPE_FLOAT, '', 0, true);
-                    if ($this->GetIDForIdentSafe($ident)) {
-                        SetValueFloat($this->GetIDForIdent($ident), floatval($v));
-                    }
+                    SetValueFloat($this->GetIDForIdent($ident), floatval($v));
                 } elseif (is_bool($v)) {
                     $ident = $this->sanitizeIdent($name);
                     $this->MaintainVariable($ident, $name, VARIABLETYPE_BOOLEAN, '', 0, true);
-                    if ($this->GetIDForIdentSafe($ident)) {
-                        SetValueBoolean($this->GetIDForIdent($ident), (bool)$v);
-                    }
+                    SetValueBoolean($this->GetIDForIdent($ident), (bool)$v);
                 } elseif (is_string($v) && strlen($v) <= 120) {
                     $ident = $this->sanitizeIdent($name);
                     $this->MaintainVariable($ident, $name, VARIABLETYPE_STRING, '', 0, true);
-                    if ($this->GetIDForIdentSafe($ident)) {
-                        SetValueString($this->GetIDForIdent($ident), $v);
-                    }
+                    SetValueString($this->GetIDForIdent($ident), $v);
                 }
             }
         }
@@ -182,36 +213,5 @@ private function parseKnown($data)
         $ident = preg_replace('/[^A-Za-z0-9_]/', '_', $name);
         if (strlen($ident) > 30) $ident = substr($ident, 0, 30);
         return $ident;
-    }
-
-    private function findNumber($arr, $keys)
-    {
-        foreach ($keys as $k) {
-            if (isset($arr[$k]) && is_numeric($arr[$k])) return $arr[$k];
-        }
-        return null;
-    }
-
-    private function findAny($arr, $keys)
-    {
-        foreach ($keys as $k) {
-            if (isset($arr[$k])) return $arr[$k];
-        }
-        return null;
-    }
-
-    private function findBool($arr, $keys)
-    {
-        foreach ($keys as $k) {
-            if (isset($arr[$k]) && is_bool($arr[$k])) return $arr[$k];
-            if (isset($arr[$k]) && ($arr[$k] === 0 || $arr[$k] === 1)) return (bool)$arr[$k];
-        }
-        return null;
-    }
-
-    // Helfer, um Existenz einer Variable sicher zu prüfen
-    private function GetIDForIdentSafe($ident)
-    {
-        try { $id = $this->GetIDForIdent($ident); return ($id > 0); } catch (Exception $e) { return false; }
     }
 }
