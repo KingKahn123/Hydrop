@@ -4,5 +4,5 @@
   "type": 5,
   "vendor": "hydrop",
   "aliases": ["Hydrop", "Hydrop REST"],
-  "prefix": "HYDROP",
+  "prefix": "HYDROP"
 }
