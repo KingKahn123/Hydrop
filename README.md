@@ -1,4 +1,4 @@
-# HYDROP (REST) – IP‑Symcon Modul
+# HYDROP – IP‑Symcon Modul
 
 Dieses Modul ruft Daten der HYDROP REST API ab und legt/aktualisiert Variablen in IP‑Symcon. Es ist generisch konfigurierbar (Header, Prefix, Pfade) und enthält einen Auto‑Mapper für JSON.
 
