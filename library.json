@@ -1,9 +1,18 @@
 {
-  "id": "{0C0B2E3A-9B8D-4B9A-8B94-5F4C8C9E3D34}",
-  "name": "HYDROP Minimal",
-  "author": "Kai",
-  "url": "",
-  "version": "1.0",
-  "build": 1,
-  "date": 20251009
+"id": "{0C0B2E3A-9B8D-4B9A-8B94-5F4C8C9E3D11}",
+"name": "HYDROP Minimal",
+"author": "you",
+"url": "",
+"version": "1.0",
+"build": 1,
+"date": 20251009,
+"modules": [
+{
+"id": "{7F5C0F6B-7D16-46A2-A7B7-9E6B9F0A3C22}",
+"name": "Hydrop Minimal",
+"type": 5,
+"prefix": "HYDROP",
+"path": "HydropModule"
+}
+]
 }
