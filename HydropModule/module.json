@@ -4,9 +4,6 @@
   "type": 5,
   "vendor": "hydrop",
   "aliases": ["Hydrop"],
-  "parentRequirements": [],
-  "childRequirements": [],
-  "implemented": [],
   "prefix": "HYDROP",
   "url": ""
 }
