@@ -14,9 +14,9 @@
     {"type": "Button", "caption": "Testen (einmal abfragen)", "onClick": "HYDROP_TestOnce();"}
   ],
   "status": [
-    {"code": 102, "icon": "Gear", "caption": "Wird erstellt"},
-    {"code": 104, "icon": "Ok", "caption": "Aktiv"},
-    {"code": 201, "icon": "Warning", "caption": "Konfiguration unvollständig"},
-    {"code": 202, "icon": "Error", "caption": "Fehler bei Abfrage"}
+    {"code": 102, "caption": "Wird erstellt"},
+    {"code": 104, "caption": "Aktiv"},
+    {"code": 201, "caption": "Konfiguration unvollständig"},
+    {"code": 202, "caption": "Fehler bei Abfrage"}
   ]
 }
