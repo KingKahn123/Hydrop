@@ -5,7 +5,6 @@ class HYDROP extends IPSModule
 {
     public function Create()
     {
-        // Never delete this line!
         parent::Create();
 
         // Properties
@@ -17,16 +16,15 @@ class HYDROP extends IPSModule
         $this->RegisterPropertyString('EndpointPath', '/api/v1/devices');
         $this->RegisterPropertyInteger('PollSeconds', 300);
 
-        // Timer
-        $this->RegisterTimer('PollTimer', 0, 'HYDROP_Poll($_IPS["TARGET"]);');
+        // Timer → ruft über RequestAction die Poll-Methode dieser Instanz auf
+        $this->RegisterTimer('PollTimer', 0, 'IPS_RequestAction($_IPS["TARGET"], "Poll", 0);');
 
-        // Common variables (optional, will be maintained by parser)
+        // Bekannte Variablen
         $this->RegisterVariableFloat('Total', 'Total', '~Water');
         $this->RegisterVariableFloat('Flow', 'Flow', '');
         $this->RegisterVariableBoolean('Leak', 'Leak', '');
         $this->RegisterVariableInteger('LastTimestamp', 'Last Timestamp', '~UnixTimestamp');
 
-        // Set inactive until configured
         $this->SetStatus(201);
     }
 
@@ -36,6 +34,21 @@ class HYDROP extends IPSModule
         $ok = $this->isConfigComplete();
         $this->SetTimerInterval('PollTimer', $ok ? $this->ReadPropertyInteger('PollSeconds') * 1000 : 0);
         $this->SetStatus($ok ? 104 : 201);
+    }
+
+    // Wird von der Form-Action und vom Timer verwendet
+    public function RequestAction($Ident, $Value)
+    {
+        switch ($Ident) {
+            case 'TestOnce':
+                $this->TestOnce();
+                return true;
+            case 'Poll':
+                $this->Poll();
+                return true;
+            default:
+                throw new Exception('Invalid action: ' . $Ident);
+        }
     }
 
     public function TestOnce()
@@ -56,18 +69,14 @@ class HYDROP extends IPSModule
             $json = $this->apiGET($this->buildEndpoint());
             $this->SendDebug('Response', substr($json, 0, 4000), 0);
             $data = json_decode($json, true);
-
             if ($data === null) {
                 throw new Exception('Invalid JSON');
             }
 
-            // Try to parse known shapes first (single measurement or list)
             $parsed = $this->parseKnown($data);
             if (!$parsed) {
-                // Fall back to auto‑mapper: flatten & create variables
                 $this->autoMapJson($data);
             }
-
             $this->SetStatus(104);
         } catch (Throwable $e) {
             $this->SendDebug('Error', $e->getMessage(), 0);
@@ -77,11 +86,10 @@ class HYDROP extends IPSModule
 
     private function buildEndpoint(): string
     {
-        $base = rtrim($this->ReadPropertyString('BaseUrl')); // allow trailing slash
+        $base = rtrim($this->ReadPropertyString('BaseUrl'), '/');
         $path = '/' . ltrim($this->ReadPropertyString('EndpointPath'), '/');
         $meterId = trim($this->ReadPropertyString('MeterId'));
-        // Simple token replacement
-        $path = str_replace(['{meterId}', '{meterID}', '{id}'], $meterId !== '' ? $meterId : '');
+        $path = str_replace(['{meterId}', '{meterID}', '{id}'], $meterId !== '' ? $meterId : '', $path);
         return $base . $path;
     }
 
@@ -91,6 +99,7 @@ class HYDROP extends IPSModule
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_TIMEOUT, 20);
+        // SSL-Checks standardmäßig aktiv (Produktion)
 
         $headers = ['Accept: application/json'];
         $name = trim($this->ReadPropertyString('AuthHeaderName'));
@@ -116,15 +125,13 @@ class HYDROP extends IPSModule
 
     private function parseKnown($data): bool
     {
-        // Case A: list of devices → just map
+        // Liste → map
         if (isset($data[0]) && is_array($data[0])) {
             $this->autoMapJson($data);
             return true;
         }
 
-        // Case B: object with measurement fields
         if (is_array($data)) {
-            // Try common keys (adjust to real API as needed)
             $total = $this->findNumber($data, ['total', 'total_m3', 'consumptionTotal', 'volumeTotal']);
             if ($total !== null) {
                 $this->SetValue('Total', (float)$total);
@@ -139,14 +146,12 @@ class HYDROP extends IPSModule
             }
             $ts = $this->findNumber($data, ['timestamp', 'ts', 'time', 'updatedAt']);
             if ($ts !== null) {
-                // Accept unix seconds or ISO string
                 if (is_numeric($ts)) {
                     $this->SetValue('LastTimestamp', (int)$ts);
-                } else if (is_string($ts)) {
+                } elseif (is_string($ts)) {
                     $this->SetValue('LastTimestamp', strtotime($ts) ?: time());
                 }
             }
-            // Regardless, map everything
             $this->autoMapJson($data);
             return true;
         }
@@ -170,7 +175,6 @@ class HYDROP extends IPSModule
                         $this->MaintainVariable($ident, $name, VARIABLETYPE_BOOLEAN, '', 0, true);
                         $this->SetValue($ident, (bool)$v);
                     } elseif (is_string($v)) {
-                        // Store short strings, drop long blobs
                         if (strlen($v) <= 120) {
                             $ident = $this->sanitizeIdent($name);
                             $this->MaintainVariable($ident, $name, VARIABLETYPE_STRING, '', 0, true);
@@ -185,7 +189,7 @@ class HYDROP extends IPSModule
     private function sanitizeIdent(string $name): string
     {
         $ident = preg_replace('/[^A-Za-z0-9_]/', '_', $name);
-        return substr($ident, 0, 30); // IP‑Symcon ident limit
+        return substr($ident, 0, 30);
     }
 
     private function findNumber(array $arr, array $keys)
@@ -212,23 +216,4 @@ class HYDROP extends IPSModule
         if (trim($this->ReadPropertyString('EndpointPath')) === '') return false;
         return true;
     }
-}
-
-// Public script wrappers for buttons/timers
-function HYDROP_TestOnce(int $InstanceID)
-{
-    $instance = IPS_GetInstance($InstanceID);
-    if ($instance['ModuleInfo']['ModuleID'] !== '{7F5C0F6B-7D16-46A2-A7B7-9E6B9F0A3C22}') {
-        throw new Exception('Wrong module');
-    }
-    /** @var HYDROP $obj */
-    $obj = IPS_GetInstanceObject($InstanceID);
-    $obj->TestOnce();
-}
-
-function HYDROP_Poll(int $InstanceID)
-{
-    /** @var HYDROP $obj */
-    $obj = IPS_GetInstanceObject($InstanceID);
-    $obj->Poll();
 }
