@@ -8,7 +8,7 @@
 {"type": "PasswordTextBox", "name": "ApiKey", "caption": "API Key", "value": ""},
 {"type": "ValidationTextBox", "name": "MeterId", "caption": "Meter ID (optional)", "value": ""},
 {"type": "ValidationTextBox", "name": "EndpointPath", "caption": "Endpoint Path", "value": "/api/v1/devices"},
-{"type": "NumberSpinner", "name": "PollSeconds", "caption": "Poll-Intervall (Sekunden)", "minimum": 10, "maximum": 86400, "value": 300}
+{"type": "NumberSpinner", "name": "PollSeconds", "caption": "Poll Intervall (Sekunden)", "minimum": 10, "maximum": 86400, "value": 300}
 ],
 "actions": [
 {"type": "Button", "caption": "Testen (einmal abfragen)", "onClick": "HYDROP_TestOnce();"}
