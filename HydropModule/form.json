@@ -14,7 +14,7 @@
     {"type": "Button", "caption": "Testen (einmal abfragen)", "onClick": "HYDROP_TestOnce();"}
   ],
   "status": [
-    {"code": 102, "caption": "Wird erstellt1"},
+    {"code": 102, "caption": "Wird erstellt"},
     {"code": 104, "caption": "Aktiv"},
     {"code": 201, "caption": "Konfiguration unvollständig"},
     {"code": 202, "caption": "Fehler bei Abfrage"}
