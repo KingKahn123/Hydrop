@@ -1,12 +1,12 @@
 {
-  "id": "{816B6C94-2B8E-58DF-BB72-B3342EA13232}",
-  "name": "HydropModule",
+  "id": "{7F5C0F6B-7D16-46A2-A7B7-9E6B9F0A3C22}",
+  "name": "HYDROP",
   "type": 3,
   "vendor": "hydrop",
   "aliases": ["Hydrop"],
-  "url": "https://github.com/KingKahn123/Hydrop/blob/main/README.md",
   "parentRequirements": [],
   "childRequirements": [],
   "implemented": [],
   "prefix": "HYDROP",
+  "url": ""
 }
