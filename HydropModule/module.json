@@ -4,9 +4,9 @@
   "type": 3,
   "vendor": "hydrop",
   "aliases": ["Hydrop"],
+  "url": "https://github.com/KingKahn123/Hydrop/blob/main/README.md",
   "parentRequirements": [],
   "childRequirements": [],
   "implemented": [],
   "prefix": "HYDROP",
-  "url": ""
 }
