@@ -7,6 +7,14 @@
          "version": "7.0"
      },
   "version": "1.0",
+  "modules": [
+    {
+      "id": "{816B6C94-2B8E-58DF-BB72-B3342EA13232}",
+      "name": "Hydrop",
+      "type": 3,
+      "prefix": "HYDROP",
+      "path": "HydropModule"
+    }
   "build": 0,
   "date": 0
 }
