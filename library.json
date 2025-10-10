@@ -2,15 +2,15 @@
   "id": "{0C0B2E3A-9B8D-4B9A-8B94-5F4C8C9E3D11}",
   "name": "HYDROP",
   "author": "Kai Stockmann",
-  "url": "https://hydrop-systems.com/",
+  "url": "https://github.com/KingKahn123/Hydrop",
   "version": "1.0",
   "build": 1,
-  "date": 20251009,
+  "date": 20251010,
   "modules": [
     {
       "id": "{7F5C0F6B-7D16-46A2-A7B7-9E6B9F0A3C22}",
       "name": "Hydrop",
-      "type": 5,
+      "type": 3,
       "prefix": "HYDROP",
       "path": "HydropModule"
     }
