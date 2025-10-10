@@ -1,11 +1,11 @@
 {
-  "id": "{0C0B2E3A-9B8D-4B9A-8B94-5F4C8C9E3D11}",
-  "author": "Kai Stockmann",
+  "id": "{D7BA605B-A501-ABCF-85DA-232C6A1A7237}",
   "name": "Hydrop",
-  "url": "https://github.com/KingKahn123/Hydrop",
+  "author": "Kai Stockmann",
+
+  "url": "https://github.com/KingKahn123",
   "compatibility": {
-         "version": "4.2",
-         "date": 1491343200
+         "version": "6.0"
      },
   "version": "1.0",
   "build": 0,
