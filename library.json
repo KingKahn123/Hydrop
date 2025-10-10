@@ -4,8 +4,6 @@
   "author": "Kai Stockmann",
   "url": "https://github.com/KingKahn123/Hydrop",
   "version": "1.0",
-  "build": 1,
-  "date": 20251010,
   "modules": [
     {
       "id": "{7F5C0F6B-7D16-46A2-A7B7-9E6B9F0A3C22}",
