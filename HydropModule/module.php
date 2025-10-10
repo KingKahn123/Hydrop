@@ -1,5 +1,5 @@
 <?php
-class HYDROP extends IPSModule
+class HydropModule extends IPSModule
 {
     public function Create()
     {
