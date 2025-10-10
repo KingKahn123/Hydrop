@@ -3,7 +3,7 @@
   "name": "HydropModule",
   "type": 3,
   "vendor": "hydrop",
-  "aliases": ["Hydrop"]
+  "aliases": ["Hydrop"],
   "url": "https://github.com/KingKahn123/Hydrop/blob/main/README.md",
   "parentRequirements": [],
   "childRequirements": [],
