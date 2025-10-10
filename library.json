@@ -1,21 +1,18 @@
 {
-  "id": "{D7BA605B-A501-ABCF-85DA-232C6A1A7237}",
-  "name": "Hydrop",
+  "id": "{0C0B2E3A-9B8D-4B9A-8B94-5F4C8C9E3D11}",
+  "name": "HYDROP",
   "author": "Kai Stockmann",
-  "url": "https://github.com/KingKahn123",
-  "compatibility": {
-         "version": "7.0"
-     },
+  "url": "https://hydrop-systems.com/",
   "version": "1.0",
+  "build": 1,
+  "date": 20251009,
   "modules": [
     {
-      "id": "{816B6C94-2B8E-58DF-BB72-B3342EA13232}",
-      "name": "HydropModule",
-      "type": 3,
+      "id": "{7F5C0F6B-7D16-46A2-A7B7-9E6B9F0A3C22}",
+      "name": "Hydrop",
+      "type": 5,
       "prefix": "HYDROP",
       "path": "HydropModule"
     }
-  ],
-  "build": 0,
-  "date": 0
+  ]
 }
