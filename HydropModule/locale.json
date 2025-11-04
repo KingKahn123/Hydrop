@@ -16,20 +16,4 @@
       "LastUpdate": "Letzte Aktualisierung",
       "Poll-Intervall (seconds)": "TEST"
     },
-    "en": {
-      "Hydrop": "Hydrop",
-      "Description": "Communication with HYDROP systems",
-      "Host": "Host address",
-      "Port": "Port",
-      "Username": "Username",
-      "Password": "Password",
-      "Connect": "Connect",
-      "Disconnect": "Disconnect",
-      "Status": "Status",
-      "Connected": "Connected",
-      "Disconnected": "Disconnected",
-      "Error": "Error",
-      "LastUpdate": "Last update"
-    }
-  }
 }
