@@ -6,17 +6,17 @@ Ein IP-Symcon-Modul zur Integration von **HYDROP-Wasserzählern** über die offi
 
 ## 🧩 Funktionen
 
-- **Automatische Abfrage** der HYDROP-REST-API im festen Intervall  
-- **Messwerte**:
-  - Gesamtverbrauch *(m³)*
-  - Zeitstempel *(Unixzeit)*
-  - Gerät *(Name / ID)*
-  - Durchfluss *(Liter pro Minute, berechnet aus Delta zwischen zwei Messungen)*
-- **Optionale automatische Variable-Erstellung (Auto-Mapper)**  
-  → erzeugt alle numerischen/booleschen/String-Felder aus der JSON-Antwort
-- Konfigurierbarer API-Header, Endpunkt, Poll-Intervall
-- Unterstützt mehrere Zähler (jeweils eigene Instanz mit eigenem API-Key/Endpoint)
-- **Timersteuerung & manuelle Testabfrage** direkt in der Instanz
+- Automatische Abfrage der HYDROP-REST-API in festen Intervallen  
+- Messwerte:
+  - **Gesamtverbrauch (m³)**
+  - **Durchfluss (L/min)** – berechnet aus Zählerdifferenz über die Zeit  
+  - **Zeitstempel (Unixzeit)**
+  - **Gerät (ID / Name)**
+- Optionale automatische Variablen-Erstellung (Auto-Mapper)  
+- Konfigurierbarer API-Zugriff (URL, Header, Key, Endpoint, Intervall)  
+- Unterstützt mehrere Zähler durch separate Instanzen  
+- Manuelle Testabfrage und Timersteuerung direkt im Formular  
+- Korrekte Einheiten dank eigener Variablenprofile (`m³`, `L/min`)
 
 ---
 
