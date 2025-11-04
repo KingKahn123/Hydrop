@@ -9,7 +9,11 @@
       "Endpoint Path": "Pfad zum API-Endpunkt",
       "Automatically create all JSON fields as variables (Auto-Mapper)": "Alle JSON-Felder automatisch als Variablen anlegen (Auto-Mapper)",
       "Polling interval (seconds)": "Abfrageintervall (Sekunden)",
-      "Test (query once)": "Test (einmal abfragen)"
+      "Test (query once)": "Test (einmal abfragen)",
+      "Device": "Gerät",
+      "Time Stamp": "Zeitstempel",
+      "Flow Rate": "Durchfluss",
+      "Total Consumption": "Gesamtverbrauch"
     }
   }
 }
