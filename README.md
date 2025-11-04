@@ -95,9 +95,13 @@ HydropModule/
 
 ---
 
-## 🧑‍💻 Lizenz & Autor
+## 🧑‍💻 Autor & Lizenz
 
-- **Autor:** Kai Stockmann  
-- **Lizenz:** MIT  
-- **Version:** 1.0.0  
-- **Kompatibel mit:** IP-Symcon ≥ 7.0
+| Feld | Info |
+|------|------|
+| **Autor:** | Kai Stockmann |
+| **Version:** | 1.1 |
+| **Kompatibel mit:** | IP-Symcon ≥ 7.0 |
+| **Lizenz:** | MIT |
+| **Repository:** | https://github.com/KingKahn123/Hydrop.git |
+
