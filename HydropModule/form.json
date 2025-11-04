@@ -3,11 +3,11 @@
     {"type": "ValidationTextBox", "name": "BaseUrl", "caption": "Base URL", "value": "https://api.hydrop-systems.com"},
     {"type": "RowLayout", "items": [
       {"type": "ValidationTextBox", "name": "AuthHeaderName", "caption": "Auth Header Name", "value": "apikey"},
-      {"type": "ValidationTextBox", "name": "AuthHeaderPrefix", "caption": "Auth Header Prefix", "value": "Bearer"}
+      {"type": "ValidationTextBox", "name": "AuthHeaderPrefix", "caption": "Auth Header Prefix", "value": ""}
     ]},
     {"type": "PasswordTextBox", "name": "ApiKey", "caption": "API Key", "value": ""},
     {"type": "ValidationTextBox", "name": "MeterId", "caption": "Meter ID (optional)", "value": ""},
-    {"type": "ValidationTextBox", "name": "EndpointPath", "caption": "Endpoint Path", "value": "/api/v1/devices"},
+    {"type": "ValidationTextBox", "name": "EndpointPath", "caption": "Endpoint Path", "value": "/sensors/all/newest"},
     {"type": "CheckBox", "name": "EnableAutoMap", "caption": "Automatically create all JSON fields as variables (Auto-Mapper)", "value": false},
     {"type": "NumberSpinner", "name": "PollSeconds", "caption": "Polling interval (seconds)", "minimum": 10, "maximum": 86400, "value": 300}
   ],
