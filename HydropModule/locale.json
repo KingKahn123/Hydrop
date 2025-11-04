@@ -1,7 +1,7 @@
 {
   "translations": {
     "de": {
-      "Hydrop": "Hydrop",
+      "Base URL": "Basis-URL",
       "Description": "Kommunikation mit HYDROP-Systemen",
       "Host": "Host-Adresse",
       "Port": "Port",
