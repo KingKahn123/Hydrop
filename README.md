@@ -1,7 +1,9 @@
-# HYDROP für IP-Symcon
+#HYDROP für IP-Symcon
 
-Ein IP-Symcon-Modul zur Integration von **HYDROP-Wasserzählern** über die offizielle REST-API (`https://api.hydrop-systems.com`).
+Ein IP-Symcon-Modul zur Integration von **HYDROP-Wasserzählern** über die offizielle REST-API  
+👉 [https://api.hydrop-systems.com](https://api.hydrop-systems.com)
 
+Das Modul liest aktuelle Messdaten (Gesamtverbrauch, Durchfluss, Zeitstempel, Gerät) aus und stellt sie als Variablen in IP-Symcon bereit.
 ---
 
 ## 🧩 Funktionen
