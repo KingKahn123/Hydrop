@@ -1,0 +1,34 @@
+{
+  "translations": {
+    "de": {
+      "Hydrop": "Hydrop",
+      "Description": "Kommunikation mit HYDROP-Systemen",
+      "Host": "Host-Adresse",
+      "Port": "Port",
+      "Username": "Benutzername",
+      "Password": "Passwort",
+      "Connect": "Verbinden",
+      "Disconnect": "Trennen",
+      "Status": "Status",
+      "Connected": "Verbunden",
+      "Disconnected": "Getrennt",
+      "Error": "Fehler",
+      "LastUpdate": "Letzte Aktualisierung"
+    },
+    "en": {
+      "Hydrop": "Hydrop",
+      "Description": "Communication with HYDROP systems",
+      "Host": "Host address",
+      "Port": "Port",
+      "Username": "Username",
+      "Password": "Password",
+      "Connect": "Connect",
+      "Disconnect": "Disconnect",
+      "Status": "Status",
+      "Connected": "Connected",
+      "Disconnected": "Disconnected",
+      "Error": "Error",
+      "LastUpdate": "Last update"
+    }
+  }
+}
