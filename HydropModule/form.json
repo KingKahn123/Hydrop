@@ -8,10 +8,10 @@
     {"type": "PasswordTextBox", "name": "ApiKey", "caption": "API Key", "value": ""},
     {"type": "ValidationTextBox", "name": "MeterId", "caption": "Meter ID (optional)", "value": ""},
     {"type": "ValidationTextBox", "name": "EndpointPath", "caption": "Endpoint Path", "value": "/api/v1/devices"},
-    {"type": "CheckBox", "name": "EnableAutoMap", "caption": "Alle JSON-Felder automatisch als Variablen anlegen (Auto-Mapper)", "value": false},
-    {"type": "NumberSpinner", "name": "PollSeconds", "caption": "Poll-Intervall (seconds)", "minimum": 10, "maximum": 86400, "value": 300}
+    {"type": "CheckBox", "name": "EnableAutoMap", "caption": "Automatically create all JSON fields as variables (Auto-Mapper)", "value": false},
+    {"type": "NumberSpinner", "name": "PollSeconds", "caption": "Polling interval (seconds)", "minimum": 10, "maximum": 86400, "value": 300}
   ],
   "actions": [
-    {"type": "Button", "caption": "Testen (einmal abfragen)", "onClick": "IPS_RequestAction($id, \"TestOnce\", 1);"}
+    {"type": "Button", "caption": "Test (query once)", "onClick": "IPS_RequestAction($id, \"TestOnce\", 1);"}
   ]
 }
