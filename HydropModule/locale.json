@@ -2,19 +2,14 @@
   "translations": {
     "de": {
       "Base URL": "Basis-URL",
-      "Description": "Kommunikation mit HYDROP-Systemen",
-      "Host": "Host-Adresse",
-      "Port": "Port",
-      "Username": "Benutzername",
-      "Password": "Passwort",
-      "Connect": "Verbinden",
-      "Disconnect": "Trennen",
-      "Status": "Status",
-      "Connected": "Verbunden",
-      "Disconnected": "Getrennt",
-      "Error": "Fehler",
-      "LastUpdate": "Letzte Aktualisierung",
-      "Poll-Intervall (seconds)": "TEST"
+      "Auth Header Name": "Name des Authentifizierungs-Headers",
+      "Auth Header Prefix": "Host-Adresse",
+      "API Key": "API-Schlüssel",
+      "Meter ID (optional)": "Zähler-ID (optional)",
+      "Endpoint Path": "Pfad zum API-Endpunkt",
+      "Automatically create all JSON fields as variables (Auto-Mapper)": "Alle JSON-Felder automatisch als Variablen anlegen (Auto-Mapper)",
+      "Polling interval (seconds)": "Abfrageintervall (Sekunden)",
+      "Test (query once)": "Test (einmal abfragen)"
     }
   }
 }
