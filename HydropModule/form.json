@@ -2,7 +2,7 @@
   "elements": [
     {"type": "ValidationTextBox", "name": "BaseUrl", "caption": "Base URL", "value": "https://api.hydrop-systems.com"},
     {"type": "RowLayout", "items": [
-      {"type": "ValidationTextBox", "name": "AuthHeaderName", "caption": "Auth Header Name", "value": "Authorization"},
+      {"type": "ValidationTextBox", "name": "AuthHeaderName", "caption": "Auth Header Name", "value": "apikey"},
       {"type": "ValidationTextBox", "name": "AuthHeaderPrefix", "caption": "Auth Header Prefix", "value": "Bearer"}
     ]},
     {"type": "PasswordTextBox", "name": "ApiKey", "caption": "API Key", "value": ""},
