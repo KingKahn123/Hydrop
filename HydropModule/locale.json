@@ -13,7 +13,8 @@
       "Connected": "Verbunden",
       "Disconnected": "Getrennt",
       "Error": "Fehler",
-      "LastUpdate": "Letzte Aktualisierung"
+      "LastUpdate": "Letzte Aktualisierung",
+      "Poll-Intervall (seconds)": "TEST"
     },
     "en": {
       "Hydrop": "Hydrop",
