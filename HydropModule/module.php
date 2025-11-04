@@ -17,8 +17,11 @@ class HYDROP extends IPSModule
         // Timer → ruft per RequestAction die Poll-Methode auf
         $this->RegisterTimer('PollTimer', 0, 'IPS_RequestAction($_IPS["TARGET"], "Poll", 0);');
 
+        // Profil einmal sicherstellen, bevor Variablen angelegt werden
+        $this->CreateProfiles();
+
         // Kern-Variablen
-        @$this->RegisterVariableFloat('Total', 'Gesamtverbrauch (m³)', '~Water');
+        @$this->RegisterVariableFloat('Total', 'Gesamtverbrauch', 'HYDROP.WaterVolume');
         @$this->RegisterVariableFloat('FlowLMin', 'Durchfluss (L/min)', '');
         @$this->RegisterVariableInteger('LastTimestamp', 'Zeitstempel', '~UnixTimestamp');
         @$this->RegisterVariableString('DeviceID', 'Gerät', '');
@@ -27,6 +30,16 @@ class HYDROP extends IPSModule
     public function ApplyChanges()
     {
         parent::ApplyChanges();
+
+        // Profil bei Änderungen/Neu-Laden sicherstellen
+        $this->CreateProfiles();
+        
+        // Falls es die Variable schon gab (z. B. früher mit ~Water), Profil umstellen
+        $vid = @$this->GetIDForIdent('Total');
+        if ($vid) {
+        IPS_SetVariableCustomProfile($vid, 'HYDROP.WaterVolume');
+        }
+        
         $seconds = (int)$this->ReadPropertyInteger('PollSeconds');
         if ($seconds < 10) $seconds = 10;
         $this->SetTimerInterval('PollTimer', $seconds * 1000);
@@ -44,6 +57,27 @@ class HYDROP extends IPSModule
                 return true;
             default:
                 throw new Exception('Unknown action ' . $Ident);
+        }
+    }
+
+    private function CreateProfiles()
+    {
+    // --- Profil für Gesamtverbrauch (m³) ---
+    $p1 = 'HYDROP.WaterVolume';
+    if (!IPS_VariableProfileExists($p1)) {
+        IPS_CreateVariableProfile($p1, VARIABLETYPE_FLOAT);
+        IPS_SetVariableProfileText($p1, '', ' m³');
+        IPS_SetVariableProfileDigits($p1, 3);
+        IPS_SetVariableProfileIcon($p1, 'Drops');
+    }
+
+    // --- Profil für Durchfluss (L/min) ---
+    $p2 = 'HYDROP.FlowRate';
+    if (!IPS_VariableProfileExists($p2)) {
+        IPS_CreateVariableProfile($p2, VARIABLETYPE_FLOAT);
+        IPS_SetVariableProfileText($p2, '', ' L/min');
+        IPS_SetVariableProfileDigits($p2, 1);
+        IPS_SetVariableProfileIcon($p2, 'Gauge');
         }
     }
 
@@ -79,7 +113,7 @@ class HYDROP extends IPSModule
             }
 
             if (isset($record['meterValue'])) {
-                $this->MaintainVariable('Total', 'Gesamtverbrauch (m³)', VARIABLETYPE_FLOAT, '~Water', 0, true);
+                $this->MaintainVariable('Total', 'Gesamtverbrauch (m³)', VARIABLETYPE_FLOAT, 'HYDROP.Water', 0, true);
                 SetValueFloat($this->GetIDForIdent('Total'), floatval($record['meterValue']));
             }
             if (isset($record['timestamp'])) {
