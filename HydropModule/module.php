@@ -21,10 +21,10 @@ class HYDROP extends IPSModule
         $this->CreateProfiles();
 
         // Kern-Variablen
-        @$this->RegisterVariableFloat('Total', 'Gesamtverbrauch', 'HYDROP.WaterVolume');
-        @$this->RegisterVariableFloat('FlowLMin', 'Durchfluss', 'HYDROP.FlowRate', 1);
-        @$this->RegisterVariableInteger('LastTimestamp', 'Zeitstempel', '~UnixTimestamp');
-        @$this->RegisterVariableString('DeviceID', 'Gerät', '');
+        @$this->RegisterVariableFloat('Total', $this->Translate('Total Consumption'), 'HYDROP.WaterVolume');
+        @$this->RegisterVariableFloat('FlowLMin', $this->Translate('Flow Rate'), 'HYDROP.FlowRate', 1);
+        @$this->RegisterVariableInteger('LastTimestamp', $this->Translate('Time Stamp'), '~UnixTimestamp');
+        @$this->RegisterVariableString('DeviceID', $this->Translate('Device'), '');
     }
 
     public function ApplyChanges()
