@@ -22,7 +22,7 @@ class HYDROP extends IPSModule
 
         // Kern-Variablen
         @$this->RegisterVariableFloat('Total', 'Gesamtverbrauch', 'HYDROP.WaterVolume');
-        @$this->RegisterVariableFloat('FlowLMin', 'Durchfluss (L/min)', '');
+        @$this->RegisterVariableFloat('FlowLMin', 'Durchfluss', 'HYDROP.FlowRate', 1);
         @$this->RegisterVariableInteger('LastTimestamp', 'Zeitstempel', '~UnixTimestamp');
         @$this->RegisterVariableString('DeviceID', 'Gerät', '');
     }
@@ -35,9 +35,14 @@ class HYDROP extends IPSModule
         $this->CreateProfiles();
         
         // Falls es die Variable schon gab (z. B. früher mit ~Water), Profil umstellen
-        $vid = @$this->GetIDForIdent('Total');
-        if ($vid) {
-        IPS_SetVariableCustomProfile($vid, 'HYDROP.WaterVolume');
+        $vidTotal = @$this->GetIDForIdent('Total');
+        if ($vidTotal) {
+        IPS_SetVariableCustomProfile($vidTotal, 'HYDROP.WaterVolume');
+        }
+
+        $vidFlow = @$this->GetIDForIdent('FlowLMin');
+        if ($vidFlow) {
+        IPS_SetVariableCustomProfile($vidFlow, 'HYDROP.FlowRate');
         }
         
         $seconds = (int)$this->ReadPropertyInteger('PollSeconds');
@@ -111,9 +116,8 @@ class HYDROP extends IPSModule
                 $this->MaintainVariable('DeviceID', 'Gerät', VARIABLETYPE_STRING, '', 0, true);
                 SetValueString($this->GetIDForIdent('DeviceID'), $deviceId);
             }
-
             if (isset($record['meterValue'])) {
-                $this->MaintainVariable('Total', 'Gesamtverbrauch (m³)', VARIABLETYPE_FLOAT, 'HYDROP.Water', 0, true);
+                $this->MaintainVariable('Total', 'Gesamtverbrauch', VARIABLETYPE_FLOAT, 'HYDROP.Water', 0, true);
                 SetValueFloat($this->GetIDForIdent('Total'), floatval($record['meterValue']));
             }
             if (isset($record['timestamp'])) {
@@ -158,7 +162,7 @@ class HYDROP extends IPSModule
             if ($dv >= 0 && $dt > 0) {
                 // m³ → Liter: *1000; pro Minute: *60/dt
                 $flowLMin = ($dv * 1000.0) * (60.0 / $dt);
-                $this->MaintainVariable('FlowLMin', 'Durchfluss (L/min)', VARIABLETYPE_FLOAT, '', 0, true);
+                $this->MaintainVariable('FlowLMin', 'Durchfluss', VARIABLETYPE_FLOAT, 'HYDROP.FlowRate', 0, true);
                 SetValueFloat($this->GetIDForIdent('FlowLMin'), $flowLMin);
             }
         }
