@@ -117,7 +117,7 @@ class HYDROP extends IPSModule
                 SetValueString($this->GetIDForIdent('DeviceID'), $deviceId);
             }
             if (isset($record['meterValue'])) {
-                $this->MaintainVariable('Total', 'Gesamtverbrauch', VARIABLETYPE_FLOAT, 'HYDROP.Water', 0, true);
+                $this->MaintainVariable('Total', 'Gesamtverbrauch', VARIABLETYPE_FLOAT, 'HYDROP.WaterVolume', 0, true);
                 SetValueFloat($this->GetIDForIdent('Total'), floatval($record['meterValue']));
             }
             if (isset($record['timestamp'])) {
