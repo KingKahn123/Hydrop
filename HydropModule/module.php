@@ -30,21 +30,6 @@ class HYDROP extends IPSModule
     public function ApplyChanges()
     {
         parent::ApplyChanges();
-
-        // Profil bei Änderungen/Neu-Laden sicherstellen
-        $this->CreateProfiles();
-        
-        // Falls es die Variable schon gab (z. B. früher mit ~Water), Profil umstellen
-        $vidTotal = @$this->GetIDForIdent('Total');
-        if ($vidTotal) {
-        IPS_SetVariableCustomProfile($vidTotal, 'HYDROP.WaterVolume');
-        }
-
-        $vidFlow = @$this->GetIDForIdent('FlowLMin');
-        if ($vidFlow) {
-        IPS_SetVariableCustomProfile($vidFlow, 'HYDROP.FlowRate');
-        }
-        
         $seconds = (int)$this->ReadPropertyInteger('PollSeconds');
         if ($seconds < 10) $seconds = 10;
         $this->SetTimerInterval('PollTimer', $seconds * 1000);
